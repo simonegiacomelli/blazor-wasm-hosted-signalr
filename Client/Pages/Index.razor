@@ -63,8 +63,9 @@
 
     private async Task SendTyped()
     {
+        var encodedMsg = $"{userInput}: {messageInput}";
         var result = await Consumer
-            .Send<EchoRequest, EchoResponse>(new EchoRequest() { Str = userInput }
+            .Send<EchoRequest, EchoResponse>(new EchoRequest() { Str = encodedMsg }
                 , async (name, payload) =>
                 {
                     Console.WriteLine($"name={name}");
