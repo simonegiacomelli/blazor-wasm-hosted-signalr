@@ -1,7 +1,9 @@
 ﻿@page "/"
 @inject NavigationManager NavigationManager
 @using Microsoft.AspNetCore.SignalR.Client
+@using BlazorWebAssemblySignalRApp.Shared.Rpc
 @implements IAsyncDisposable
+@inject HttpClient Http
 
 <PageTitle>Index</PageTitle>
 
@@ -18,6 +20,7 @@
     </label>
 </div>
 <button @onclick="Send" disabled="@(!IsConnected)">Send</button>
+<button @onclick="SendTyped" disabled="@(!IsConnected)">SendTyped</button>
 
 <hr>
 
@@ -56,6 +59,24 @@
         {
             await hubConnection.SendAsync("SendMessage", userInput, messageInput);
         }
+    }
+
+    private async Task SendTyped()
+    {
+        var result = await Consumer
+            .Send<EchoRequest, EchoResponse>(new EchoRequest() { Str = userInput }
+                , async (name, payload) =>
+                {
+                    Console.WriteLine($"name={name}");
+                    Console.WriteLine($"payload={payload}");
+                    var m = RpcMessage.Encode(name, payload);
+                    var res = await Http
+                        .PostAsync(RpcMessage.HandlerName, new StringContent(m));
+                    var str = await res.Content.ReadAsStringAsync();
+                    return str;
+                });
+        messages.Add(result.Result);
+        StateHasChanged();
     }
 
     public bool IsConnected =>

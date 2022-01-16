@@ -1,4 +1,7 @@
+using System.Text;
 using BlazorWebAssemblySignalRApp.Server.Hubs;
+using BlazorWebAssemblySignalRApp.Shared;
+using BlazorWebAssemblySignalRApp.Shared.Rpc;
 using Microsoft.AspNetCore.ResponseCompression;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -7,6 +10,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddRazorPages();
+
 
 // signalR
 builder.Services.AddSignalR();
@@ -47,5 +51,18 @@ app.MapRazorPages();
 app.MapControllers();
 app.MapHub<ChatHub>("/chathub");
 app.MapFallbackToFile("index.html");
+
+var contextHandler = new ContextHandlers<Object>();
+contextHandler.Register(
+    (EchoRequest req, Object context) => { return new EchoResponse { Result = $"echo {req.Str}" }; });
+app.MapPost(RpcMessage.HandlerName, async (r) =>
+{
+    var stream = new StreamReader(r.Request.Body);
+    var body = await stream.ReadToEndAsync();
+    Console.WriteLine($"got it {body}");
+    var res = contextHandler.Dispatch(RpcMessage.Decoder(body), new());
+    var bytes = Encoding.UTF8.GetBytes(res);
+    await r.Response.Body.WriteAsync(bytes, 0, bytes.Length);
+});
 
 app.Run();
