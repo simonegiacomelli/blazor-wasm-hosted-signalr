@@ -16,7 +16,7 @@ public class Dispatcher
 
     public static string GetNameFromType<T>() => typeof(T).FullName!;
 
-    public static object? Dispatch(object provider, string name, string payload)
+    public static object? Dispatch(object provider, string methodName, string payload)
     {
         return "todo";
     }

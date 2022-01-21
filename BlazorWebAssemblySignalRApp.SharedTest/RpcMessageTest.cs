@@ -1,6 +1,4 @@
 using System;
-using System.Linq;
-using System.Reflection;
 using System.Text.Json;
 using System.Threading.Tasks;
 using BlazorWebAssemblySignalRApp.Shared.Rpc;
@@ -66,11 +64,10 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
 
             disp.Register<ICalculator>();
 
-
-            Func<string, string, Task<string>> dispatcher = async (name, payload) =>
+            Func<string, string, string, Task<string>> dispatcher = async (typeName, methodName, payload) =>
             {
-                var dres = Dispatcher.Dispatch(provider, name, payload);
-                Console.WriteLine($"dispatcher name={name} payload={payload}");
+                var dres = Dispatcher.Dispatch(provider, methodName, payload);
+                Console.WriteLine($"dispatcher name={methodName} payload={payload}");
                 var res = JsonSerializer.Serialize(16, typeof(int));
                 var restore = JsonSerializer.Deserialize(res, typeof(int));
                 return res;
@@ -139,51 +136,4 @@ public class DispatcherTest
     //     var calc = new Impl1.Calculator();
     //     Dispatcher.Dispatch<ICalculator>(calc,name,payload);
     // }
-}
-
-public class RpcClient : DispatchProxy
-{
-    public Func<string, string, Task<string>> dispatcher;
-
-    public static T Create<T>(Func<string, string, Task<string>> dispatcher)
-    {
-        var proxy = DispatchProxy.Create<T, RpcClient>();
-        var p = proxy as RpcClient;
-        p.dispatcher = dispatcher;
-
-        return proxy;
-    }
-
-    protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
-    {
-        var m = targetMethod!;
-        var pi = m.GetParameters();
-        var name = m.Name;
-
-        var ser = new MethodSerializer(m);
-        var argsSer = ser.ArgsSerializer.Serializer(args[0]);
-        var tresult = dispatcher.Invoke(name, argsSer);
-        var tresultResult = tresult.Result;
-        var r = ser.ReturnSerializer.Deserializer(tresultResult);
-
-        var methodInfo = typeof(Task).GetMethod("FromResult");
-        var genericMethodInfo = methodInfo.MakeGenericMethod(ser.ReturnSerializer.Type);
-        var result2 = genericMethodInfo.Invoke(null, new object[] { r });
-        return result2;
-
-        Console.WriteLine($"Invoke {targetMethod} {String.Join(", ", args)}");
-
-        var serializedArgs = pi.ToList().Select((p, i) =>
-        {
-            var str = JsonSerializer.Serialize(args[i], p.ParameterType);
-            return str;
-        }).ToList();
-
-        var payload = JsonSerializer.Serialize(serializedArgs);
-        Console.WriteLine($"payload={payload}");
-        var result = dispatcher.Invoke(name, payload);
-        Console.WriteLine($"result={result.Result}");
-
-        return Task.FromResult(42);
-    }
 }
