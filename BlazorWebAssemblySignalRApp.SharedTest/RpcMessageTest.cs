@@ -69,6 +69,7 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
 
             Func<string, string, Task<string>> dispatcher = async (name, payload) =>
             {
+                var dres = Dispatcher.Dispatch(provider, name, payload);
                 Console.WriteLine($"dispatcher name={name} payload={payload}");
                 var res = JsonSerializer.Serialize(16, typeof(int));
                 var restore = JsonSerializer.Deserialize(res, typeof(int));
@@ -101,7 +102,7 @@ namespace Interface2
 
 namespace Impl1
 {
-    class Provider : Interface1.ICalculator
+    class Calculator : Interface1.ICalculator
     {
         public async Task<int> Power(int a) => a * a;
     }
@@ -109,7 +110,7 @@ namespace Impl1
 
 namespace Impl2
 {
-    class Provider : Interface2.ICalculator
+    class Calculator : Interface2.ICalculator
     {
         public async Task<int> Power(int a) => a * a;
     }
@@ -131,6 +132,13 @@ public class DispatcherTest
         Assert.AreEqual(typeof(Interface1.ICalculator), dispatcher.GetTypeFromName(name1));
         Assert.AreEqual(typeof(Interface2.ICalculator), dispatcher.GetTypeFromName(name2));
     }
+    //
+    // [Test]
+    // public async Task TestDispatch()
+    // {
+    //     var calc = new Impl1.Calculator();
+    //     Dispatcher.Dispatch<ICalculator>(calc,name,payload);
+    // }
 }
 
 public class RpcClient : DispatchProxy

@@ -1,4 +1,3 @@
-using System.Reflection;
 using System.Text.Json;
 
 namespace BlazorWebAssemblySignalRApp.Shared.Rpc;
@@ -141,22 +140,4 @@ public class AnySerializer
     public Type Type { get; set; }
     public Func<Object, string> Serializer { get; set; }
     public Func<string, Object> Deserializer { get; set; }
-}
-
-public class MethodSerializer
-{
-    public MethodSerializer(MethodInfo method)
-    {
-        //todo deal with Result type Task<T>
-        //one should not serializer the instance of Task<T> 
-        //but unwrap it 
-        var ret = method.ReturnType.GenericTypeArguments[0];
-        ReturnSerializer = AnySerializer.New(ret);
-
-        var arg0 = method.GetParameters()[0].ParameterType;
-        ArgsSerializer = AnySerializer.New(arg0);
-    }
-
-    public AnySerializer ArgsSerializer { get; set; }
-    public AnySerializer ReturnSerializer { get; set; }
 }
