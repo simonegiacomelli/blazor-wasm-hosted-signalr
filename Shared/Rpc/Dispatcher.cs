@@ -21,7 +21,8 @@ public class Dispatcher
         var m = provider.GetType().GetMethod(methodName);
         var ms = new MethodSerializer(m!);
         var arg0 = ms.ArgsSerializer.Deserializer(payload);
-        var res = m.Invoke(provider, new object?[] { arg0 });
+        var args = (object[])arg0;
+        var res = m.Invoke(provider, args);
         var tt = res.GetType();
         var prop = tt.GetProperty("Result")!;
         var unwrapped = prop.GetValue(res, null);

@@ -4,6 +4,10 @@ namespace BlazorWebAssemblySignalRApp.Shared.Rpc;
 
 public class AnySerializer
 {
+    public Type Type { get; set; }
+    public Func<Object, string> Serializer { get; set; }
+    public Func<string, Object> Deserializer { get; set; }
+
     public static AnySerializer New<T>() where T : class
     {
         return new AnySerializer
@@ -22,8 +26,4 @@ public class AnySerializer
             Deserializer = s => JsonSerializer.Deserialize(s, type)!
         };
     }
-
-    public Type Type { get; set; }
-    public Func<Object, string> Serializer { get; set; }
-    public Func<string, Object> Deserializer { get; set; }
 }

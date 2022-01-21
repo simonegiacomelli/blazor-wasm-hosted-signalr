@@ -70,9 +70,9 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
                 var res = Dispatcher.Dispatch(calculator, methodName, payload);
                 return res;
             };
-            var power2 = RpcClient.Create<ICalculator>(dispatcher).Power(4);
-            var result = await power2;
-            Assert.AreEqual(16, result);
+            var asyncResult = RpcClient.Create<ICalculator>(dispatcher).Sum(1, 5);
+            var result = await asyncResult;
+            Assert.AreEqual(6, result);
         }
     }
 }
@@ -82,6 +82,7 @@ namespace Interface1
     interface ICalculator
     {
         public Task<int> Power(int a);
+        public Task<int> Sum(int a, int b);
     }
 }
 
@@ -100,6 +101,7 @@ namespace Impl1
     class Calculator : Interface1.ICalculator
     {
         public async Task<int> Power(int a) => a * a;
+        public async Task<int> Sum(int a, int b) => a + b;
     }
 }
 
