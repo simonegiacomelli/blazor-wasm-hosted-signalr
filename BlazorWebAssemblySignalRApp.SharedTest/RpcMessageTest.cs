@@ -54,10 +54,10 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
     }
 
     [TestFixture]
-    public class RpcInterfaceServiceWith2ArgsTest
+    public class RpcInterfaceServiceTest
     {
         [Test]
-        public async Task IntefaceTest()
+        public async Task ServiceWith2ArgsTest()
         {
             var disp = new Registry();
 
@@ -73,6 +73,24 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
             var result = await asyncResult;
             Assert.AreEqual(6, result);
         }
+
+        [Test]
+        public async Task ServiceWith0ArgsTest()
+        {
+            var disp = new Registry();
+
+            disp.Register<ICalculator>();
+
+            var dispatcher = disp.Dispatcher((type) =>
+            {
+                Assert.AreEqual(typeof(ICalculator), type);
+                return new Calculator();
+            });
+
+            var asyncResult = RpcClient.Create<ICalculator>(dispatcher).ZeroArgs();
+            var result = await asyncResult;
+            Assert.AreEqual(42, result);
+        }
     }
 }
 
@@ -82,6 +100,7 @@ namespace Interface1
     {
         public Task<int> Power(int a);
         public Task<int> Sum(int a, int b);
+        public Task<int> ZeroArgs();
     }
 }
 
@@ -101,6 +120,7 @@ namespace Impl1
     {
         public async Task<int> Power(int a) => a * a;
         public async Task<int> Sum(int a, int b) => a + b;
+        public Task<int> ZeroArgs() => Task.FromResult(42);
     }
 }
 
