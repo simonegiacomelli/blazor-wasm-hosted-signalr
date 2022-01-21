@@ -1,5 +1,3 @@
-using System.Text.Json;
-
 namespace BlazorWebAssemblySignalRApp.Shared.Rpc;
 
 public interface IRequest<TRes>
@@ -68,38 +66,6 @@ public class Consumer
     }
 }
 
-public class RpcMessage
-{
-    public string Name;
-    public string Payload;
-    public const string HandlerName = "/rpc-api";
-
-    private const string Marker = "#dotnet";
-
-    public static RpcMessage Decoder(string message)
-    {
-        var (header, payload, _) = message.Split("\n\n", count: 2);
-        var props = header.Split("\n").ToList()
-            .FindAll(e => e.Trim().Length > 0)
-            .Select(e =>
-            {
-                var (k, v, _) = e.Split("=", count: 2);
-                return (k, v);
-            })
-            .ToDictionary(e => e.Item1, e => e.Item2);
-        var name = props.GetValueOrDefault("name") ??
-                   throw new Exception($"key name not found in message ```{message}```");
-        return new RpcMessage { Name = name, Payload = payload };
-    }
-
-
-    public static string Encode(string name, string payload)
-    {
-        var message = $"name={name}\n\n{payload}";
-        return message;
-    }
-}
-
 public static class Extensions
 {
     public static void Deconstruct<T>(this IList<T> list, out T first, out IList<T> rest)
@@ -114,30 +80,4 @@ public static class Extensions
         second = list.Count > 1 ? list[1] : default(T); // or throw
         rest = list.Skip(2).ToList();
     }
-}
-
-public class AnySerializer
-{
-    public static AnySerializer New<T>() where T : class
-    {
-        return new AnySerializer
-        {
-            Serializer = o => JsonSerializer.Serialize<T>((T)o),
-            Deserializer = s => JsonSerializer.Deserialize<T>(s)!
-        };
-    }
-
-    public static AnySerializer New(Type type)
-    {
-        return new AnySerializer
-        {
-            Type = type,
-            Serializer = o => JsonSerializer.Serialize(o, type),
-            Deserializer = s => JsonSerializer.Deserialize(s, type)!
-        };
-    }
-
-    public Type Type { get; set; }
-    public Func<Object, string> Serializer { get; set; }
-    public Func<string, Object> Deserializer { get; set; }
 }
