@@ -59,16 +59,7 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
         [Test]
         public async Task ServiceWith2ArgsTest()
         {
-            var disp = new Registry();
-
-            disp.Register<ICalculator>();
-
-            var dispatcher = disp.Dispatcher((type) =>
-            {
-                Assert.AreEqual(typeof(ICalculator), type);
-                return new Calculator();
-            });
-
+            var dispatcher = Dispatcher();
             var asyncResult = RpcClient.Create<ICalculator>(dispatcher).Sum(1, 5);
             var result = await asyncResult;
             Assert.AreEqual(6, result);
@@ -77,8 +68,16 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
         [Test]
         public async Task ServiceWith0ArgsTest()
         {
-            var disp = new Registry();
+            var dispatcher = Dispatcher();
+            var asyncResult = RpcClient.Create<ICalculator>(dispatcher).ZeroArgs();
+            var result = await asyncResult;
+            Assert.AreEqual(42, result);
+        }
 
+
+        private static DDispatcher Dispatcher()
+        {
+            var disp = new Registry();
             disp.Register<ICalculator>();
 
             var dispatcher = disp.Dispatcher((type) =>
@@ -86,10 +85,7 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
                 Assert.AreEqual(typeof(ICalculator), type);
                 return new Calculator();
             });
-
-            var asyncResult = RpcClient.Create<ICalculator>(dispatcher).ZeroArgs();
-            var result = await asyncResult;
-            Assert.AreEqual(42, result);
+            return dispatcher.Invoke;
         }
     }
 }
@@ -120,7 +116,7 @@ namespace Impl1
     {
         public async Task<int> Power(int a) => a * a;
         public async Task<int> Sum(int a, int b) => a + b;
-        public Task<int> ZeroArgs() => Task.FromResult(42);
+        public async Task<int> ZeroArgs() => 42;
     }
 }
 

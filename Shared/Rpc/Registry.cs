@@ -1,5 +1,7 @@
 namespace BlazorWebAssemblySignalRApp.Shared.Rpc;
 
+public delegate Task<String> DDispatcher(string typeName, string methodName, string payload);
+
 public class Registry
 {
     private Dictionary<String, Type> dict = new();
