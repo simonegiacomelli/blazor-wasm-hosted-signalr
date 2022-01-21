@@ -1,6 +1,6 @@
 namespace BlazorWebAssemblySignalRApp.Shared.Rpc;
 
-public class Dispatcher
+public class Registry
 {
     private Dictionary<String, Type> dict = new();
 
@@ -33,7 +33,7 @@ public class Dispatcher
         return ser;
     }
 
-    public Func<string, string, string, Task<string>> Dispatcher2(Func<Type, object> activator)
+    public Func<string, string, string, Task<string>> Dispatcher(Func<Type, object> activator)
     {
         Func<string, string, string, Task<string>> dispatcher = async (typeName, methodName, payload) =>
         {

@@ -11,7 +11,7 @@ public class RpcClient : DispatchProxy
         var proxy = Create<T, RpcClient>();
         var p = proxy as RpcClient;
         p.dispatcher = dispatcher;
-        p.typeName = Dispatcher.GetNameFromType<T>();
+        p.typeName = Registry.GetNameFromType<T>();
         return proxy;
     }
 
