@@ -3,10 +3,10 @@ using BlazorWebAssemblySignalRApp.Shared.Rpc;
 
 public class RpcClient : DispatchProxy
 {
-    public DDispatcher dispatcher;
+    public Dispatcher dispatcher;
     private string typeName;
 
-    public static T Create<T>(DDispatcher dispatcher)
+    public static T Create<T>(Dispatcher dispatcher)
     {
         var proxy = Create<T, RpcClient>();
         var p = proxy as RpcClient;

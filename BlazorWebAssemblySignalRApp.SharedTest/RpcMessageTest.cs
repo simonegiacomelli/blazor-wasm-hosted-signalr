@@ -75,7 +75,7 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
         }
 
 
-        private static DDispatcher Dispatcher()
+        private static Dispatcher Dispatcher()
         {
             var disp = new Registry();
             disp.Register<ICalculator>();
