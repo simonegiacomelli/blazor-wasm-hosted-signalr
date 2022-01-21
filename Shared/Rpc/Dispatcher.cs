@@ -16,8 +16,16 @@ public class Dispatcher
 
     public static string GetNameFromType<T>() => typeof(T).FullName!;
 
-    public static object? Dispatch(object provider, string methodName, string payload)
+    public static string Dispatch(object provider, string methodName, string payload)
     {
-        return "todo";
+        var m = provider.GetType().GetMethod(methodName);
+        var ms = new MethodSerializer(m!);
+        var arg0 = ms.ArgsSerializer.Deserializer(payload);
+        var res = m.Invoke(provider, new object?[] { arg0 });
+        var tt = res.GetType();
+        var prop = tt.GetProperty("Result")!;
+        var unwrapped = prop.GetValue(res, null);
+        var ser = ms.ReturnSerializer.Serializer(unwrapped);
+        return ser;
     }
 }

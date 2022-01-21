@@ -1,7 +1,7 @@
 using System;
-using System.Text.Json;
 using System.Threading.Tasks;
 using BlazorWebAssemblySignalRApp.Shared.Rpc;
+using Impl1;
 using Interface1;
 using NUnit.Framework;
 
@@ -59,17 +59,15 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
         [Test]
         public async Task IntefaceTest()
         {
-            var provider = new Provider();
+            var calculator = new Calculator();
             var disp = new Dispatcher();
 
             disp.Register<ICalculator>();
 
             Func<string, string, string, Task<string>> dispatcher = async (typeName, methodName, payload) =>
             {
-                var dres = Dispatcher.Dispatch(provider, methodName, payload);
                 Console.WriteLine($"dispatcher name={methodName} payload={payload}");
-                var res = JsonSerializer.Serialize(16, typeof(int));
-                var restore = JsonSerializer.Deserialize(res, typeof(int));
+                var res = Dispatcher.Dispatch(calculator, methodName, payload);
                 return res;
             };
             var power2 = RpcClient.Create<ICalculator>(dispatcher).Power(4);
@@ -109,7 +107,7 @@ namespace Impl2
 {
     class Calculator : Interface2.ICalculator
     {
-        public async Task<int> Power(int a) => a * a;
+        public async Task<int> Power(int a) => a * a * a;
     }
 }
 

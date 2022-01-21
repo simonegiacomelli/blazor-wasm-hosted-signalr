@@ -23,7 +23,7 @@ public class RpcClient : DispatchProxy
 
         var ser = new MethodSerializer(m);
         var argsSer = ser.ArgsSerializer.Serializer(args[0]);
-        var tresult = dispatcher.Invoke(methodName, typeName, argsSer);
+        var tresult = dispatcher.Invoke(typeName, methodName, argsSer);
         var tresultResult = tresult.Result;
         var r = ser.ReturnSerializer.Deserializer(tresultResult);
 
