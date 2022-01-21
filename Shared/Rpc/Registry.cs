@@ -37,13 +37,13 @@ public class Registry
 
     public Dispatcher Dispatcher(Func<Type, object> activator)
     {
-        Func<string, string, string, Task<string>> dispatcher = async (typeName, methodName, payload) =>
+        Dispatcher dispatcher = async (typeName, methodName, payload) =>
         {
             var type = GetTypeFromName(typeName);
             var o = activator(type);
             var res = Dispatch(o, methodName, payload);
             return res;
         };
-        return dispatcher.Invoke;
+        return dispatcher;
     }
 }
