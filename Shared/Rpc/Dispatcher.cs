@@ -11,7 +11,10 @@ public class Dispatcher
 
     public Type GetTypeFromName(string name)
     {
-        return dict[name];
+        var res = dict.GetValueOrDefault(name);
+        if (res == null)
+            throw new InvalidOperationException($"No interface registered under name `{name}`");
+        return res;
     }
 
     public static string GetNameFromType<T>() => typeof(T).FullName!;
@@ -28,5 +31,17 @@ public class Dispatcher
         var unwrapped = prop.GetValue(res, null);
         var ser = ms.ReturnSerializer.Serializer(unwrapped);
         return ser;
+    }
+
+    public Func<string, string, string, Task<string>> Dispatcher2(Func<Type, object> activator)
+    {
+        Func<string, string, string, Task<string>> dispatcher = async (typeName, methodName, payload) =>
+        {
+            var type = GetTypeFromName(typeName);
+            var o = activator(type);
+            var res = Dispatch(o, methodName, payload);
+            return res;
+        };
+        return dispatcher;
     }
 }

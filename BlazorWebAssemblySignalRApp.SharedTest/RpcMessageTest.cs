@@ -59,18 +59,17 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
         [Test]
         public async Task IntefaceTest()
         {
-            var calculator = new Calculator();
             var disp = new Dispatcher();
 
             disp.Register<ICalculator>();
 
-            Func<string, string, string, Task<string>> dispatcher = async (typeName, methodName, payload) =>
+            var dispatcher2 = disp.Dispatcher2((type) =>
             {
-                Console.WriteLine($"dispatcher name={methodName} payload={payload}");
-                var res = Dispatcher.Dispatch(calculator, methodName, payload);
-                return res;
-            };
-            var asyncResult = RpcClient.Create<ICalculator>(dispatcher).Sum(1, 5);
+                Assert.AreEqual(typeof(ICalculator), type);
+                return new Calculator();
+            });
+
+            var asyncResult = RpcClient.Create<ICalculator>(dispatcher2).Sum(1, 5);
             var result = await asyncResult;
             Assert.AreEqual(6, result);
         }
