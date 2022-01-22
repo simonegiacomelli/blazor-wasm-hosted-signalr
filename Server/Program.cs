@@ -76,5 +76,7 @@ app.MapPost(RpcInterfaceMessage.HandlerName, async r =>
     var msg = RpcInterfaceMessage.Decoder(body);
 
     var dispatcher = registry.Dispatcher(type => new RpcTest());
+    var result = await dispatcher(msg);
+    await r.Response.WriteAsync(result);
 });
 app.Run();
