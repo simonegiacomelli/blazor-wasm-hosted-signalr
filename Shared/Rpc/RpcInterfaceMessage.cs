@@ -2,10 +2,14 @@ namespace BlazorWebAssemblySignalRApp.Shared.Rpc;
 
 public class RpcInterfaceMessage
 {
-    public string TypeName;
-    public string MethodName;
-    public string Payload;
+    public string TypeName { get; set; }
+    public string MethodName { get; set; }
+    public string Payload { get; set; }
 
+
+    public RpcInterfaceMessage()
+    {
+    }
 
     public RpcInterfaceMessage(string typeName, string methodName, string payload)
     {

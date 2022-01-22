@@ -1,7 +1,7 @@
 using System.Reflection;
 using BlazorWebAssemblySignalRApp.Shared.Rpc;
 
-public class RpcClient : DispatchProxy
+public class RpcClient : DispatchProxyAsync
 {
     public Dispatcher dispatcher;
     private string typeName;
@@ -15,22 +15,27 @@ public class RpcClient : DispatchProxy
         return proxy;
     }
 
-    protected override object? Invoke(MethodInfo? targetMethod, object?[]? args)
+    public override object Invoke(MethodInfo method, object[] args)
     {
-        var m = targetMethod!;
-        var pi = m.GetParameters();
+        throw new NotImplementedException();
+    }
+
+    public override Task InvokeAsync(MethodInfo method, object[] args)
+    {
+        throw new NotImplementedException();
+    }
+
+    public override async Task<T> InvokeAsyncT<T>(MethodInfo method, object[] args)
+    {
+        var m = method;
         var methodName = m.Name;
 
         var ser = new MethodSerializer(m);
         var argsSer = ser.ArgsSerializer.Serializer(args);
-        // var tresult = dispatcher.Invoke(typeName, methodName, argsSer);
         var tresult = dispatcher.Invoke(new RpcInterfaceMessage(typeName, methodName, argsSer));
-        var tresultResult = tresult.Result;
+        var tresultResult = await tresult;
         var r = ser.ReturnSerializer.Deserializer(tresultResult);
-
-        var methodInfo = typeof(Task).GetMethod("FromResult");
-        var genericMethodInfo = methodInfo.MakeGenericMethod(ser.ReturnSerializer.Type);
-        var result2 = genericMethodInfo.Invoke(null, new object[] { r });
-        return result2;
+        var result3 = (T)r;
+        return result3;
     }
 }

@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.Json;
 using BlazorWebAssemblySignalRApp.Server.Hubs;
 using BlazorWebAssemblySignalRApp.Shared;
 using BlazorWebAssemblySignalRApp.Shared.Rpc;
@@ -74,7 +73,7 @@ app.MapPost(RpcInterfaceMessage.HandlerName, async r =>
     var stream = new StreamReader(r.Request.Body);
     var body = await stream.ReadToEndAsync();
     Console.WriteLine($"RpcInterfaceMessage got it {body}");
-    var msg = JsonSerializer.Deserialize<RpcInterfaceMessage>(body);
+    var msg = RpcInterfaceMessage.Decoder(body);
 
     var dispatcher = registry.Dispatcher(type => new RpcTest());
     var result = await dispatcher(msg);

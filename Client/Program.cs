@@ -1,4 +1,3 @@
-using System.Net.Http.Json;
 using BlazorWebAssemblySignalRApp.Client;
 using BlazorWebAssemblySignalRApp.Shared;
 using BlazorWebAssemblySignalRApp.Shared.Rpc;
@@ -16,7 +15,8 @@ Console.WriteLine("ciao");
 Dispatcher dispatcher = async (RpcInterfaceMessage msg) =>
 {
     var http = new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) };
-    var response = await http.PostAsJsonAsync(RpcInterfaceMessage.HandlerName, msg);
+    var content = msg.Encode();
+    var response = await http.PostAsync(RpcInterfaceMessage.HandlerName, new StringContent(content));
     var res = response.Content.ReadAsStringAsync();
     return await res;
 };
