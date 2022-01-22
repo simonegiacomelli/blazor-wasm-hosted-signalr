@@ -55,14 +55,26 @@ app.MapFallbackToFile("index.html");
 var contextHandler = new ContextHandlers<Object>();
 contextHandler.Register(
     (EchoRequest req, Object context) => { return new EchoResponse { Result = $"echo {req.Str}" }; });
-app.MapPost(RpcMessage.HandlerName, async (r) =>
+app.MapPost(RpcMessage.HandlerName, async r =>
 {
     var stream = new StreamReader(r.Request.Body);
     var body = await stream.ReadToEndAsync();
-    Console.WriteLine($"got it {body}");
+    Console.WriteLine($"RpcMessage got it {body}");
     var res = contextHandler.Dispatch(RpcMessage.Decoder(body), new());
     var bytes = Encoding.UTF8.GetBytes(res);
     await r.Response.Body.WriteAsync(bytes, 0, bytes.Length);
 });
 
+var registry = new Registry();
+registry.Register<IRpcTest>();
+
+app.MapPost(RpcInterfaceMessage.HandlerName, async r =>
+{
+    var stream = new StreamReader(r.Request.Body);
+    var body = await stream.ReadToEndAsync();
+    Console.WriteLine($"RpcInterfaceMessage got it {body}");
+    var msg = RpcInterfaceMessage.Decoder(body);
+
+    var dispatcher = registry.Dispatcher(type => new RpcTest());
+});
 app.Run();

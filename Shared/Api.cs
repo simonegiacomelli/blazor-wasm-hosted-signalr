@@ -1,11 +1,11 @@
 namespace BlazorWebAssemblySignalRApp.Shared;
 
-interface IRpcTest
+public interface IRpcTest
 {
     Task<int> Sum(int a, int b);
 }
 
-class RpcTest : IRpcTest
+public class RpcTest : IRpcTest
 {
     public async Task<int> Sum(int a, int b) => a + b;
 }
