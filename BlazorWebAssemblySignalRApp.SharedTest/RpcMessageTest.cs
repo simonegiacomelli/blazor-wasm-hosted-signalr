@@ -21,6 +21,20 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
     }
 
     [TestFixture]
+    public class RpcInterfaceMessageTest
+    {
+        [Test]
+        public void test1()
+        {
+            var msg = RpcInterfaceMessage.Encode("type1", "method1", "bar");
+            var restored = RpcInterfaceMessage.Decoder(msg);
+            Assert.AreEqual("type1", restored.TypeName);
+            Assert.AreEqual("method1", restored.MethodName);
+            Assert.AreEqual("bar", restored.Payload);
+        }
+    }
+
+    [TestFixture]
     public class RpcSingleInstanceExchangeTest
     {
         class SumRequest : IRequest<SumResponse>
