@@ -1,4 +1,5 @@
 using System.Text;
+using BlazorWebAssemblySignalRApp.Server.Controllers;
 using BlazorWebAssemblySignalRApp.Server.Hubs;
 using BlazorWebAssemblySignalRApp.Shared;
 using BlazorWebAssemblySignalRApp.Shared.Rpc;
@@ -22,6 +23,12 @@ builder.Services.AddResponseCompression(opts =>
         new[] { "application/octet-stream" });
 });
 // signalR
+
+builder.Services.AddControllers(o => o.InputFormatters.Insert(o.InputFormatters.Count, new TextPlainInputFormatter()));
+builder.Services.AddScoped<IRpcTest>(sp => new RpcTest());
+var registry = new Registry();
+builder.Services.AddSingleton(sp => registry);
+// builder.Services.AddSingleton<IRpcTest>(sp => new RpcTest());
 
 var app = builder.Build();
 
@@ -65,18 +72,17 @@ app.MapPost(RpcMessage.HandlerName, async r =>
     await r.Response.Body.WriteAsync(bytes, 0, bytes.Length);
 });
 
-var registry = new Registry();
+
 registry.Register<IRpcTest>();
-
-app.MapPost(RpcInterfaceMessage.HandlerName, async r =>
-{
-    var stream = new StreamReader(r.Request.Body);
-    var body = await stream.ReadToEndAsync();
-    Console.WriteLine($"RpcInterfaceMessage got it {body}");
-    var msg = RpcInterfaceMessage.Decoder(body);
-
-    var dispatcher = registry.Dispatcher(type => new RpcTest());
-    var result = await dispatcher(msg);
-    await r.Response.WriteAsync(result);
-});
+//
+// app.MapPost(RpcInterfaceMessage.HandlerName, async r =>
+// {
+//     var stream = new StreamReader(r.Request.Body);
+//     var body = await stream.ReadToEndAsync();
+//     Console.WriteLine($"RpcInterfaceMessage got it {body}");
+//     var msg = RpcInterfaceMessage.Decoder(body);
+//     var dispatcher = registry.Dispatcher(type => new RpcTest());
+//     var result = await dispatcher(msg);
+//     await r.Response.WriteAsync(result);
+// });
 app.Run();
