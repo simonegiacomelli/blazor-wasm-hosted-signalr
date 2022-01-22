@@ -5,6 +5,16 @@ public class RpcInterfaceMessage
     public string TypeName;
     public string MethodName;
     public string Payload;
+
+
+    public RpcInterfaceMessage(string typeName, string methodName, string payload)
+    {
+        TypeName = typeName;
+        MethodName = methodName;
+        Payload = payload;
+    }
+
+
     public const string HandlerName = "/rpc-interface-api";
 
     private const string Marker = "#dotnet-interface";
@@ -24,12 +34,7 @@ public class RpcInterfaceMessage
         string GetProp(string key) => props.GetValueOrDefault(key) ??
                                       throw new Exception($"key `{key}` not found in message ```{message}```");
 
-        return new RpcInterfaceMessage
-        {
-            TypeName = GetProp("type"),
-            MethodName = GetProp("method"),
-            Payload = payload
-        };
+        return new RpcInterfaceMessage(GetProp("type"), GetProp("method"), payload);
     }
 
 

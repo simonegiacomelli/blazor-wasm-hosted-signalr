@@ -1,6 +1,6 @@
 namespace BlazorWebAssemblySignalRApp.Shared.Rpc;
 
-public delegate Task<String> Dispatcher(string typeName, string methodName, string payload);
+public delegate Task<String> Dispatcher(RpcInterfaceMessage msg);
 
 public class Registry
 {
@@ -37,11 +37,11 @@ public class Registry
 
     public Dispatcher Dispatcher(Func<Type, object> activator)
     {
-        Dispatcher dispatcher = async (typeName, methodName, payload) =>
+        Dispatcher dispatcher = async (msg) =>
         {
-            var type = GetTypeFromName(typeName);
+            var type = GetTypeFromName(msg.TypeName);
             var o = activator(type);
-            var res = Dispatch(o, methodName, payload);
+            var res = Dispatch(o, msg.MethodName, msg.Payload);
             return res;
         };
         return dispatcher;
