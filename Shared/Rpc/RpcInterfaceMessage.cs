@@ -37,6 +37,7 @@ public class RpcInterfaceMessage
         return new RpcInterfaceMessage(GetProp("type"), GetProp("method"), payload);
     }
 
+    public string Encode() => Encode(TypeName, MethodName, Payload);
 
     public static string Encode(string typeName, string methodName, string payload)
     {

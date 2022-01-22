@@ -73,7 +73,7 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
         [Test]
         public async Task ServiceWith2ArgsTest()
         {
-            var dispatcher = Dispatcher();
+            var dispatcher = MockDispatcher();
             var asyncResult = RpcClient.Create<ICalculator>(dispatcher).Sum(1, 5);
             var result = await asyncResult;
             Assert.AreEqual(6, result);
@@ -82,14 +82,14 @@ namespace BlazorWebAssemblySignalRApp.SharedTest
         [Test]
         public async Task ServiceWith0ArgsTest()
         {
-            var dispatcher = Dispatcher();
+            var dispatcher = MockDispatcher();
             var asyncResult = RpcClient.Create<ICalculator>(dispatcher).ZeroArgs();
             var result = await asyncResult;
             Assert.AreEqual(42, result);
         }
 
 
-        private static Dispatcher Dispatcher()
+        private static Dispatcher MockDispatcher()
         {
             var disp = new Registry();
             disp.Register<ICalculator>();
